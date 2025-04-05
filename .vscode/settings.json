@@ -1,0 +1,24 @@
+{
+    "files.associations": {
+        "bit": "cpp",
+        "*.tcc": "cpp",
+        "compare": "cpp",
+        "cstdint": "cpp",
+        "cstdlib": "cpp",
+        "string": "cpp",
+        "exception": "cpp",
+        "memory_resource": "cpp",
+        "cmath": "cpp",
+        "functional": "cpp",
+        "iostream": "cpp",
+        "istream": "cpp",
+        "new": "cpp",
+        "numeric": "cpp",
+        "ostream": "cpp",
+        "string_view": "cpp",
+        "system_error": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "typeinfo": "cpp"
+    }
+}
