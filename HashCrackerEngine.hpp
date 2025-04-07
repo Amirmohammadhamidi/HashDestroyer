@@ -247,12 +247,40 @@ public:
         passwordFound = false;
         foundPassword.clear();
         found.store(false);
+        
+        // Total candidate count for 5-character strings (36^5)
+        const int totalCandidates = 60466176;
+        // Number of threads to launch
+        const int numThreads = 1000;
+        // Candidate range per thread
+        int segment = totalCandidates / numThreads;
         std::string charset = "abcdefghijklmnopqrstuvwxyz0123456789";
-        int maxLength = 5; // Demo limit
+        
         std::vector<std::future<void>> futures;
-        for (char ch : charset) {
-            futures.push_back(std::async(std::launch::async, [&, ch]() {
-                bruteForceThread(std::string(1, ch), charset, maxLength, targetHash);
+        for (int i = 0; i < numThreads; i++) {
+            int startIdx = i * segment;
+            int endIdx = (i == numThreads - 1) ? totalCandidates : (i + 1) * segment;
+            futures.push_back(std::async(std::launch::async, [&, startIdx, endIdx, targetHash, charset]() {
+                for (int idx = startIdx; idx < endIdx; idx++) {
+                    if(found.load())
+                        break;
+                    // Convert idx into a 5-character candidate (base-36 conversion)
+                    std::string candidate(5, ' ');
+                    int temp = idx;
+                    for (int pos = 4; pos >= 0; pos--) {
+                        candidate[pos] = charset[temp % 36];
+                        temp /= 36;
+                    }
+                    if(MD5::hash(candidate) == targetHash) {
+                        std::lock_guard<std::mutex> lock(mtx);
+                        if(!found.load()){
+                            found = true;
+                            foundPassword = candidate;
+                            passwordFound = true;
+                        }
+                        break;
+                    }
+                }
             }));
         }
         for (auto& fut : futures)
@@ -263,32 +291,6 @@ public:
 private:
     std::atomic<bool> found{false};
     std::mutex mtx;
-    void bruteForceThread(const std::string &prefix,
-                          const std::string &charset,
-                          int maxLength,
-                          const std::string &targetHash) {
-        std::function<void(const std::string&)> rec = [&](const std::string &candidate) {
-            if(found.load() || candidate.size() > static_cast<size_t>(maxLength))
-                return;
-            if (!candidate.empty() && MD5::hash(candidate) == targetHash) {
-                std::lock_guard<std::mutex> lock(mtx);
-                if(!found.load()){
-                    found = true;
-                    foundPassword = candidate;
-                    passwordFound = true;
-                }
-                return;
-            }
-            if(candidate.size() == static_cast<size_t>(maxLength))
-                return;
-            for (char c : charset) {
-                if(found.load())
-                    return;
-                rec(candidate + c);
-            }
-        };
-        rec(prefix);
-    }
 };
 
 //
@@ -305,7 +307,7 @@ public:
         passwordFound = false;
         foundPassword.clear();
         // We assume a candidate length of 5 and plan to search (example value)
-        int numCandidates = 1000000; // Adjust as needed
+        int numCandidates = 60466176;
         char foundCandidate[6] = {0};
         bool gpuFound = false;
         // Call the CUDA wrapper function.

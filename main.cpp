@@ -39,7 +39,7 @@ int main() {
         std::cout << "[MD5 (GPU)] Time taken: " << elapsed.count() << " seconds" << std::endl;
     }
     
-    std::string bfTestPassword = "abc12";
+    std::string bfTestPassword = "gzz12";
     std::string bfExpectedHash = MD5::hash(bfTestPassword);
     std::cout << "\nBrute-force Test:" << std::endl;
     std::cout << "Brute-force target password (5 letters): \"" << bfTestPassword << "\"" << std::endl;
@@ -51,7 +51,7 @@ int main() {
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
         if (cracked.empty())
-            std::cout << "[MD5 Brute-force (GPU)] Password not found!" << std::endl;
+            std::cout << "[MD5 Brute-force (GPU )] Password not found!" << std::endl;
         else
             std::cout << "[MD5 Brute-force (GPU)] Cracked password: " << cracked << std::endl;
         std::cout << "[MD5 Brute-force (GPU)] Time taken: " << elapsed.count() << " seconds" << std::endl;
