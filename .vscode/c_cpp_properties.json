@@ -1,17 +1,15 @@
 {
     "configurations": [
         {
-            "name": "windows-gcc-x86",
+            "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**"
             ],
-            "compilerPath": "C:/MinGW/bin/g++.exe",
-            "cStandard": "${default}",
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
             "cppStandard": "gnu++17",
-            "intelliSenseMode": "windows-gcc-x86",
-            "compilerArgs": [
-                ""
-            ]
+            "intelliSenseMode": "linux-gcc-x64"
         }
     ],
     "version": 4
