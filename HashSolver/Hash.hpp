@@ -3,25 +3,31 @@
 
 #include <iostream>
 #include <algorithm>
+#include <string>
+
+using namespace std;
+
 class Hash
 {
 private:
-    char *hash;
-    char *type;
+    string hash = "";
+    string type = "";
     char charSet[70];
-    char *wordlistPath;
+    string wordlistPath = "";
     bool isWomen;
     int length_lower_bound = 4;
     int length_upper_bound = 10;
 
 public:
-    Hash(char *hash)
+    Hash(string hash)
     {
         this->hash = hash;
     };
 
-    ~Hash();
-    void set_type(char *type)
+    ~Hash() {
+
+    };
+    void set_type(string type)
     {
         this->type = type;
     };
@@ -38,12 +44,12 @@ public:
     {
         std::copy(charSet, charSet + size, this->charSet);
     };
-    void loadWordList(char *wordlistPath)
+    void loadWordList(string wordlistPath)
     {
         this->wordlistPath = wordlistPath;
     };
     void crack();
-    void wordlistCracker();
+    void wordlistCracker(bool flag);
     void finish_cracking();
 };
 
