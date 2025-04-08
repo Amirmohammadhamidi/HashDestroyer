@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <condition_variable>
 #include <sys/stat.h>
+#include <cstring>
 #include "Hash.hpp"
 #include "../HashCrackerEngine.hpp"
 using namespace std;
@@ -188,27 +189,70 @@ void Hash::wordlistCracker(bool flag)
     }
     else
     {
-        ifstream wordlist;
-        wordlist.open("../wordlists/rockyou.txt");
+        int charset_len = strlen(this->charset);
+        int total_ids = charset_len * charset_len * charset_len;
+        int *prefixes_counter = new int[total_ids](); // zero-initialize
 
-        fstream prefix_file;
-        prefix_file.open("../wordlists/rockyou_prefix.txt", ios::out);
+        ifstream wordlist("../wordlists/rockyou.txt");
+        fstream prefix_file("../wordlists/rockyou_prefix_dictionary.txt", ios::out);
 
-        if (!wordlist && !prefix_file)
+        if (!wordlist || !prefix_file)
             return;
 
         string line;
-        int counter = 0;
+        int max_frequency = 0;
         while (getline(wordlist, line))
         {
-            if (line.length() <= 5)
+            if (line.size() < 3)
+                continue;
+            int id = string_to_id(line.substr(0, 3));
+            prefixes_counter[id]++;
+            if (prefixes_counter[id] > max_frequency)
             {
-                prefix_file << line << endl;
-                counter++;
+                max_frequency = prefixes_counter[id];
             }
         }
         wordlist.close();
+
+        vector<string> arr[max_frequency + 1];
+        for (int i = 0; i < total_ids; i++)
+        {
+            arr[prefixes_counter[i]].push_back(id_to_string(i));
+        }
+
+        for (int i = max_frequency; i >= 0; i--)
+        {
+            if (arr[i].empty())
+                continue;
+            for (size_t j = 0; j < arr[i].size() - 1; j++)
+            {
+                prefix_file << arr[i][j] << ",";
+            }
+            prefix_file << arr[i][arr[i].size() - 1] << ":" << i << endl;
+        }
         prefix_file.close();
-        cout << counter << endl;
+
+        delete[] prefixes_counter;
     }
+}
+string Hash::id_to_string(int id)
+{
+    int charset_len = strlen(this->charset);
+    string res(3, ' ');
+    res[2] = this->charset[id % charset_len];
+    id /= charset_len;
+    res[1] = this->charset[id % charset_len];
+    id /= charset_len;
+    res[0] = this->charset[id % charset_len];
+    return res;
+}
+
+int Hash::string_to_id(string str)
+{
+    int charset_len = strlen(this->charset);
+    int id = 0;
+    id += this->mapper[str[0]];
+    id += charset_len * this->mapper[str[1]];
+    id += charset_len * charset_len * this->mapper[str[2]];
+    return id;
 }

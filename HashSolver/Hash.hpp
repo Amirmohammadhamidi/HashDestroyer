@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
+#include <map>
 
 using namespace std;
 
@@ -12,7 +13,8 @@ class Hash
 private:
     string hash = "";
     string type = "";
-    char charSet[70];
+    const char *charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%*()^&";
+    map<char, int> mapper;
     string wordlistPath = "";
     bool isWomen;
     int length_lower_bound = 4;
@@ -22,6 +24,10 @@ public:
     Hash(string hash)
     {
         this->hash = hash;
+        for (int i = 0; charset[i] != '\0'; ++i)
+        {
+            mapper[charset[i]] = i;
+        }
     };
 
     ~Hash() {
@@ -40,16 +46,16 @@ public:
         this->length_lower_bound = length_lower_bound;
         this->length_upper_bound = length_upper_bound;
     };
-    void loadcharSet(char *charSet, size_t size)
-    {
-        std::copy(charSet, charSet + size, this->charSet);
-    };
+
     void loadWordList(string wordlistPath)
     {
         this->wordlistPath = wordlistPath;
     };
     void crack();
     void wordlistCracker(bool flag);
+    string id_to_string(int id);
+    int string_to_id(string str);
+    void sort_prefixes_wordlist(string path, int max_frequncy);
     void finish_cracking();
 };
 
