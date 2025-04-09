@@ -77,6 +77,10 @@ private:
             c = b;
             b = b + leftRotate(a + f + k[i] + w[g], s[i]);
             a = temp;
+            // Debugging output
+        
+            
+            
         }
         a += aa; b += bb; c += cc; d += dd;
     }
@@ -307,7 +311,9 @@ public:
         passwordFound = false;
         foundPassword.clear();
         // We assume a candidate length of 5 and plan to search (example value)
-        int numCandidates = 60466176;
+        int candidateLength = 5; // Example length of candidates
+        int charsetSize = 73; // Assuming alphanumeric characters (26 letters + 10 digits)
+        int numCandidates = static_cast<int>(std::pow(charsetSize, candidateLength));
         char foundCandidate[6] = {0};
         bool gpuFound = false;
         // Call the CUDA wrapper function.
