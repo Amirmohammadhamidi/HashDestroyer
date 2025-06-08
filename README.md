@@ -1,4 +1,4 @@
-# jendeh_ripper
+# HASH CRACKER
 this project is for pass cracking
 
 
